@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type HttpClient interface {
+type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
 type API struct {
 	Endpoint string
 	Referer  string
-	Client   HttpClient
+	Client   HTTPClient
 }
 
 func NewAPI() (*API, error) {
@@ -27,7 +27,7 @@ func NewAPIWIthEndpoint(endpoint, referer string) (*API, error) {
 	return NewAPIWithClient(endpoint, referer, &http.Client{})
 }
 
-func NewAPIWithClient(endpoint, referer string, client HttpClient) (*API, error) {
+func NewAPIWithClient(endpoint, referer string, client HTTPClient) (*API, error) {
 	api := &API{
 		endpoint,
 		referer,
@@ -61,7 +61,7 @@ func (api *API) GetLine() ([]Clan, time.Time, error) {
 		return nil, time.Time{}, err
 	}
 
-	result := &ApiResponse{}
+	result := &APIResponse{}
 	err = json.Unmarshal(body, result)
 	if err != nil {
 		return nil, time.Time{}, err
@@ -79,7 +79,7 @@ func (api *API) GetByRank(rank int) (Clan, time.Time, error) {
 		return Clan{}, time.Time{}, err
 	}
 
-	result := &ApiResponse{}
+	result := &APIResponse{}
 	err = json.Unmarshal(body, result)
 	if err != nil {
 		return Clan{}, time.Time{}, err
@@ -97,7 +97,7 @@ func (api *API) GetByName(name string, page int) ([]Clan, time.Time, int64, erro
 		return nil, time.Time{}, 0, err
 	}
 
-	result := &ApiResponse{}
+	result := &APIResponse{}
 	err = json.Unmarshal(body, result)
 	if err != nil {
 		return nil, time.Time{}, 0, err
@@ -115,7 +115,7 @@ func (api *API) GetByLeader(leader string, page int) ([]Clan, time.Time, int64, 
 		return nil, time.Time{}, 0, err
 	}
 
-	result := &ApiResponse{}
+	result := &APIResponse{}
 	err = json.Unmarshal(body, result)
 	if err != nil {
 		return nil, time.Time{}, 0, err

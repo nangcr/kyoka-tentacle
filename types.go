@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// ApiResponse 接口返回json的模型
-type ApiResponse struct {
+// APIResponse 接口返回json的模型
+type APIResponse struct {
 	Code int64     `json:"code"`
 	Msg  string    `json:"msg"`
 	Data []Clan    `json:"data"`
@@ -24,8 +24,8 @@ type Clan struct {
 	LeaderViewerID int64  `json:"leader_viewer_id"`
 }
 
-func (api *ApiResponse) MarshalJSON() ([]byte, error) {
-	type Alias ApiResponse
+func (api *APIResponse) MarshalJSON() ([]byte, error) {
+	type Alias APIResponse
 	return json.Marshal(&struct {
 		Ts int64 `json:"ts"`
 		*Alias
@@ -35,8 +35,8 @@ func (api *ApiResponse) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (api *ApiResponse) UnmarshalJSON(data []byte) error {
-	type Alias ApiResponse
+func (api *APIResponse) UnmarshalJSON(data []byte) error {
+	type Alias APIResponse
 	aux := &struct {
 		Ts int64 `json:"ts"`
 		*Alias
