@@ -2,9 +2,11 @@ package kyokatentacle
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -14,23 +16,25 @@ type HTTPClient interface {
 }
 
 type API struct {
-	Endpoint string
-	Referer  string
-	Client   HTTPClient
+	Endpoint     string
+	Referer      string
+	CustomSource string
+	Client       HTTPClient
 }
 
 func NewAPI() (*API, error) {
-	return NewAPIWithClient(ENDPOINT, REFERER, &http.Client{})
+	return NewAPIWithClient(ENDPOINT, REFERER, CUSTOMSOURCE, &http.Client{})
 }
 
-func NewAPIWIthEndpoint(endpoint, referer string) (*API, error) {
-	return NewAPIWithClient(endpoint, referer, &http.Client{})
+func NewAPIWIthEndpoint(endpoint, referer, customSource string) (*API, error) {
+	return NewAPIWithClient(endpoint, referer, customSource, &http.Client{})
 }
 
-func NewAPIWithClient(endpoint, referer string, client HTTPClient) (*API, error) {
+func NewAPIWithClient(endpoint, referer, customSource string, client HTTPClient) (*API, error) {
 	api := &API{
 		endpoint,
 		referer,
+		customSource,
 		client,
 	}
 	return api, nil
@@ -42,13 +46,17 @@ func (api *API) sendRequest(method, query, payload string) ([]byte, error) {
 		return nil, err
 	}
 	request.Header.Set(`Content-Type`, `application/json`)
-	request.Header.Set(`Referer`, `https://kengxxiao.github.io/Kyouka/`)
+	request.Header.Set(`Referer`, api.Referer)
+	request.Header.Set(`Custom-Source`, api.CustomSource)
 	response, err := api.Client.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
+	if response.StatusCode != 200 {
+		return nil, errors.New("status code:" + strconv.Itoa(response.StatusCode) + "\nbody:" + string(body))
+	}
 	return body, nil
 }
 
